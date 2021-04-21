@@ -357,6 +357,15 @@ float:
       run-groups:
         exact:
           args: []
+    pgvector:
+      docker-tag: ann-benchmarks-pgvector
+      module: ann_benchmarks.algorithms.pgvector
+      constructor: Pgvector
+      base-args: ["@metric"]
+      run-groups:
+        pgvector:
+          args: [[100, 1000]]
+          query-args: [[1, 3, 5, 7, 9]]
 
   euclidean:
     scann:
