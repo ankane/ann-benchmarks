@@ -4,6 +4,13 @@ import psycopg2
 from ann_benchmarks.algorithms.base import BaseANN
 
 
+# For best performance:
+# - Use socket connection
+# - Use prepared statements (todo)
+# - Use binary format (todo)
+# - Increase work_mem? (todo)
+# - Increase shared_buffers? (todo)
+# - Try different drivers (todo)
 class Pgvector(BaseANN):
     def __init__(self, metric, lists):
         self._metric = metric
