@@ -23,7 +23,7 @@ class Pgvector(BaseANN):
         self._table = 'vectors_%s_%d' % (metric, lists)
         self._query = 'SELECT id FROM %s ORDER BY vec %s %%s LIMIT %%s' % (self._table, self._op)
 
-        self._conn = psycopg2.connect('dbname=vector_bench')
+        self._conn = psycopg2.connect('user=postgres dbname=vector_bench')
         self._conn.autocommit = True
         self._cur = self._conn.cursor()
         self._cur.execute('CREATE EXTENSION IF NOT EXISTS vector')
