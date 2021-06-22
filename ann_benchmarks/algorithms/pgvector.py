@@ -30,7 +30,8 @@ class Pgvector(BaseANN):
 
     def fit(self, X):
         self._cur.execute('DROP TABLE IF EXISTS %s' % self._table)
-        self._cur.execute('CREATE TABLE %s (id integer, vec vector(%d))' % (self._table, X.shape[1]))
+        # Use unlogged table to speed up COPY and CREATE INDEX
+        self._cur.execute('CREATE UNLOGGED TABLE %s (id integer, vec vector(%d))' % (self._table, X.shape[1]))
 
         file = '/tmp/%s.csv' % self._table
         with open(file, 'w', newline='') as csvfile:
