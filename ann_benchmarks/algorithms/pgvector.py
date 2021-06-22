@@ -36,7 +36,7 @@ class Pgvector(BaseANN):
         self._cur.execute('SET ivfflat.probes = %s', (str(probes),))
 
     def query(self, v, n):
-        self._cur.execute('SELECT id FROM tst ORDER BY vec ' + self._op + ' %s LIMIT %s', ('[' + ','.join(str(v2) for v2 in v.tolist()) + ']', n))
+        self._cur.execute('SELECT id FROM tst ORDER BY vec ' + self._op + ' %s LIMIT %s', (v.tolist(), n))
         res = self._cur.fetchall()
         return [r[0] for r in res]
 

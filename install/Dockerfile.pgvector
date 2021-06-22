@@ -11,7 +11,7 @@ RUN sh -c 'echo "local all all trust" > /etc/postgresql/13/main/pg_hba.conf'
 RUN pip3 install psycopg2
 RUN python3 -c 'import psycopg2'
 
-RUN git clone --branch v0.1.4 https://github.com/ankane/pgvector.git
+RUN git clone --branch v0.1.7 https://github.com/ankane/pgvector.git
 RUN cd pgvector && make && make install
 
 RUN service postgresql start && PGUSER=postgres createdb vector_bench && service postgresql stop
