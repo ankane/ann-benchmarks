@@ -13,30 +13,33 @@ class Pgvector(BaseANN):
 
         self._opclass = {'angular': 'vector_cosine_ops', 'euclidean': 'vector_l2_ops'}[metric]
         self._op = {'angular': '<=>', 'euclidean': '<->'}[metric]
+        self._table = 'vectors_%s_%d' % (metric, lists)
+        self._query = 'SELECT id FROM %s ORDER BY vec %s %%s LIMIT %%s' % (self._table, self._op)
 
-        self._conn = psycopg2.connect('user=postgres dbname=vector_bench')
+        self._conn = psycopg2.connect('dbname=vector_bench')
         self._conn.autocommit = True
         self._cur = self._conn.cursor()
+        self._cur.execute('CREATE EXTENSION IF NOT EXISTS vector')
 
     def fit(self, X):
-        self._cur.execute('CREATE EXTENSION IF NOT EXISTS vector')
-        self._cur.execute('DROP TABLE IF EXISTS tst')
-        self._cur.execute('CREATE TABLE tst (id integer, vec vector(' + str(X.shape[1]) + '))')
+        self._cur.execute('DROP TABLE IF EXISTS %s' % self._table)
+        self._cur.execute('CREATE TABLE %s (id integer, vec vector(%d))' % (self._table, X.shape[1]))
 
-        with open('/tmp/data.csv', 'w', newline='') as csvfile:
+        file = '/tmp/%s.csv' % self._table
+        with open(file, 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile)
             for i, x in enumerate(X):
                 csvwriter.writerow([i, '[' + ','.join(str(v) for v in x.tolist()) + ']'])
-        self._cur.execute('COPY tst (id, vec) FROM \'/tmp/data.csv\' WITH (FORMAT csv)')
+        self._cur.execute('COPY %s (id, vec) FROM \'%s\' WITH (FORMAT csv)' % (self._table, file))
 
-        self._cur.execute('CREATE INDEX ON tst USING ivfflat (vec ' + self._opclass + ') WITH (lists = ' + str(self._lists) + ')')
+        self._cur.execute('CREATE INDEX ON %s USING ivfflat (vec %s) WITH (lists = %d)' % (self._table, self._opclass, self._lists))
 
     def set_query_arguments(self, probes):
         self._probes = probes
         self._cur.execute('SET ivfflat.probes = %s', (str(probes),))
 
     def query(self, v, n):
-        self._cur.execute('SELECT id FROM tst ORDER BY vec ' + self._op + ' %s LIMIT %s', (v.tolist(), n))
+        self._cur.execute(self._query, (v.tolist(), n))
         res = self._cur.fetchall()
         return [r[0] for r in res]
 
