@@ -29,9 +29,7 @@ class Pgvector(BaseANN):
         self._cur.execute('CREATE EXTENSION IF NOT EXISTS vector')
 
     def fit(self, X):
-        self._cur.execute('DROP TABLE IF EXISTS %s' % self._table)
-        # Use unlogged table to speed up COPY and CREATE INDEX
-        self._cur.execute('CREATE UNLOGGED TABLE %s (id integer, vec vector(%d))' % (self._table, X.shape[1]))
+        self._cur.execute('CREATE TEMPORARY TABLE %s (id integer, vec vector(%d))' % (self._table, X.shape[1]))
 
         file = '/tmp/%s.csv' % self._table
         with open(file, 'w', newline='') as csvfile:
@@ -41,6 +39,7 @@ class Pgvector(BaseANN):
         self._cur.execute('COPY %s (id, vec) FROM \'%s\' WITH (FORMAT csv)' % (self._table, file))
 
         self._cur.execute('CREATE INDEX ON %s USING ivfflat (vec %s) WITH (lists = %d)' % (self._table, self._opclass, self._lists))
+        self._cur.execute('ANALYZE %s' % self._table)
 
     def set_query_arguments(self, probes):
         self._probes = probes
