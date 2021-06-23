@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-import csv
+import io
 import psycopg2
 from ann_benchmarks.algorithms.base import BaseANN
 
@@ -31,12 +31,14 @@ class Pgvector(BaseANN):
     def fit(self, X):
         self._cur.execute('CREATE TEMPORARY TABLE %s (id integer, vec vector(%d))' % (self._table, X.shape[1]))
 
-        file = '/tmp/%s.csv' % self._table
-        with open(file, 'w', newline='') as csvfile:
-            csvwriter = csv.writer(csvfile)
-            for i, x in enumerate(X):
-                csvwriter.writerow([i, '[' + ','.join(str(v) for v in x.tolist()) + ']'])
-        self._cur.execute('COPY %s (id, vec) FROM \'%s\' WITH (FORMAT csv)' % (self._table, file))
+        f = io.StringIO()
+        for i, x in enumerate(X):
+            f.write(str(i))
+            f.write('\t')
+            f.write('[' + ','.join(str(v) for v in x.tolist()) + ']')
+            f.write('\n')
+        f.seek(0)
+        self._cur.copy_from(f, self._table, columns=('id', 'vec'))
 
         self._cur.execute('CREATE INDEX ON %s USING ivfflat (vec %s) WITH (lists = %d)' % (self._table, self._opclass, self._lists))
         self._cur.execute('ANALYZE %s' % self._table)
