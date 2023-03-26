@@ -8,8 +8,8 @@ RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-k
 RUN apt-get update && apt-get install -y postgresql postgresql-server-dev-15
 RUN sh -c 'echo "local all all trust" > /etc/postgresql/15/main/pg_hba.conf'
 
-RUN pip3 install psycopg2-binary pgvector
-RUN python3 -c 'import psycopg2'
+RUN pip3 install "psycopg[binary]" pgvector
+RUN python3 -c 'import psycopg'
 
 RUN git clone --branch v0.4.1 https://github.com/pgvector/pgvector.git
 RUN cd pgvector && make && make install
