@@ -10,7 +10,7 @@ from ann_benchmarks.algorithms.base import BaseANN
 # - Use socket connection
 # - Use prepared statements
 # - Use binary format
-# - Increase work_mem? (todo)
+# - Increase work_mem
 # - Increase shared_buffers? (todo)
 # - Try different drivers (todo)
 class Pgvector(BaseANN):
@@ -51,6 +51,8 @@ class Pgvector(BaseANN):
     def set_query_arguments(self, probes):
         self._probes = probes
         self._cur.execute("SET ivfflat.probes = '%s'" % (str(probes),))
+        # TODO tune based on available memory
+        self._cur.execute("SET work_mem = '%s'" % ('256MB',))
 
     def query(self, v, n):
         res = self._cur.execute(self._query, (v, n), binary=True, prepare=True).fetchall()
