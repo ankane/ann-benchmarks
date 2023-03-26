@@ -23,7 +23,7 @@ class Pgvector(BaseANN):
         self._opclass = {'angular': 'vector_cosine_ops', 'euclidean': 'vector_l2_ops'}[metric]
         self._op = {'angular': '<=>', 'euclidean': '<->'}[metric]
         self._table = 'vectors_%s_%d' % (metric, lists)
-        self._query = 'SELECT id FROM %s ORDER BY vec %s %%b LIMIT %%b' % (self._table, self._op)
+        self._query = 'SELECT id FROM %s ORDER BY vec %s %%s LIMIT %%s' % (self._table, self._op)
 
         self._conn = psycopg.connect('dbname=pgvector_bench user=postgres')
         self._conn.autocommit = True
@@ -53,7 +53,7 @@ class Pgvector(BaseANN):
         self._cur.execute("SET ivfflat.probes = '%s'" % (str(probes),))
 
     def query(self, v, n):
-        res = self._cur.execute(self._query, (v, n), prepare=True).fetchall()
+        res = self._cur.execute(self._query, (v, n), binary=True, prepare=True).fetchall()
         return [r[0] for r in res]
 
     def __str__(self):
