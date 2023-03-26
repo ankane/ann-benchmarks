@@ -8,8 +8,8 @@ from ann_benchmarks.algorithms.base import BaseANN
 
 # For best performance:
 # - Use socket connection
-# - Use prepared statements (todo)
-# - Use binary format (todo)
+# - Use prepared statements
+# - Use binary format
 # - Increase work_mem? (todo)
 # - Increase shared_buffers? (todo)
 # - Try different drivers (todo)
@@ -53,7 +53,7 @@ class Pgvector(BaseANN):
         self._cur.execute("SET ivfflat.probes = '%s'" % (str(probes),))
 
     def query(self, v, n):
-        res = self._cur.execute(self._query, (v, n)).fetchall()
+        res = self._cur.execute(self._query, (v, n), prepare=True).fetchall()
         return [r[0] for r in res]
 
     def __str__(self):
