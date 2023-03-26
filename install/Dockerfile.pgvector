@@ -1,0 +1,20 @@
+FROM ann-benchmarks
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get install -y wget
+RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt jammy-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+RUN apt-get update && apt-get install -y postgresql postgresql-server-dev-15
+RUN sh -c 'echo "local all all trust" > /etc/postgresql/15/main/pg_hba.conf'
+
+RUN pip3 install psycopg2-binary pgvector
+RUN python3 -c 'import psycopg2'
+
+RUN git clone --branch v0.4.1 https://github.com/pgvector/pgvector.git
+RUN cd pgvector && make && make install
+
+RUN service postgresql start && PGUSER=postgres createdb pgvector_bench && service postgresql stop
+
+RUN echo 'service postgresql start && python3 -u run_algorithm.py "$@"' > entrypoint.sh
+ENTRYPOINT ["/bin/bash", "/home/app/entrypoint.sh"]
