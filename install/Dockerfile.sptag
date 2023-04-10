@@ -3,6 +3,13 @@
 FROM ann-benchmarks
 
 RUN git clone --recursive https://github.com/microsoft/SPTAG
+
+# Patch
+# https://github.com/microsoft/SPTAG/issues/243
+RUN cd SPTAG && \
+        curl -Ls https://github.com/pabs3/SPTAG/commit/bd9c25d1409325ac45ebeb7f1e8fc87d03ec478c.patch | git apply && \
+        cd ..
+
 RUN apt-get update && apt-get -y install wget build-essential libtbb-dev software-properties-common swig
 
 # cmake >= 3.12 is required
