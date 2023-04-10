@@ -4,12 +4,6 @@ FROM ann-benchmarks
 
 RUN git clone --recursive https://github.com/microsoft/SPTAG
 
-# Patch
-# https://github.com/microsoft/SPTAG/issues/243
-RUN cd SPTAG && \
-        curl -Ls https://github.com/pabs3/SPTAG/commit/bd9c25d1409325ac45ebeb7f1e8fc87d03ec478c.patch | git apply && \
-        cd ..
-
 RUN apt-get update && apt-get -y install wget build-essential libtbb-dev software-properties-common swig
 
 # cmake >= 3.12 is required
@@ -28,6 +22,11 @@ RUN wget "https://boostorg.jfrog.io/artifactory/main/release/1.67.0/source/boost
 
 # SPTAG defaults to Python 2 if it's found on the system, so as a hack, we remove it. See https://github.com/microsoft/SPTAG/blob/master/Wrappers/CMakeLists.txt
 RUN apt-get -y remove libpython2.7
+
+# Patch https://github.com/microsoft/SPTAG/issues/243
+RUN cd SPTAG && \
+        curl -Ls https://github.com/pabs3/SPTAG/commit/bd9c25d1409325ac45ebeb7f1e8fc87d03ec478c.patch | git apply && \
+        cd ..
 
 # Compile
 RUN cd SPTAG && mkdir build && cd build && cmake .. && make && cd ..
