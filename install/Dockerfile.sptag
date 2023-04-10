@@ -25,7 +25,7 @@ RUN apt-get -y remove libpython2.7
 
 # Patch https://github.com/microsoft/SPTAG/issues/243
 RUN cd SPTAG && \
-        curl -Ls https://github.com/pabs3/SPTAG/commit/bd9c25d1409325ac45ebeb7f1e8fc87d03ec478c.patch | git apply && \
+        wget -qO- https://github.com/pabs3/SPTAG/commit/bd9c25d1409325ac45ebeb7f1e8fc87d03ec478c.patch | git apply && \
         cd ..
 
 # Compile
