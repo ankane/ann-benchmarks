@@ -28,39 +28,39 @@ jobs:
       matrix:
         dataset: [random-xs-20-angular]
         library:
-          - annoy
-          - diskann
-          - dolphinn
-          - elasticsearch
-          - elastiknn
-          - faiss
-          - flann
-          - hnswlib
-          - luceneknn
-          - milvus
-          - mrpt
-          - n2
-          - ngt
-          - nmslib
-          - opensearchknn
-          - pgvector
-          - pynndescent
-          - qdrant
-          - qsgngt
-          - scann
-          - scipy
-          - sklearn
+          # - annoy
+          # - diskann
+          # - dolphinn
+          # - elasticsearch
+          # - elastiknn
+          # - faiss
+          # - flann
+          # - hnswlib
+          # - luceneknn
+          # - milvus
+          # - mrpt
+          # - n2
+          # - ngt
+          # - nmslib
+          # - opensearchknn
+          # - pgvector
+          # - pynndescent
+          # - qdrant
+          # - qsgngt
+          # - scann
+          # - scipy
+          # - sklearn
           - sptag
-          - vald
-          - vearch
-          - vespa
-        include:
-          - library: pynndescent 
-            dataset: random-xs-16-hamming
-          - library: datasketch
-            dataset: random-s-jaccard
-          - library: pynndescent
-            dataset: random-s-jaccard
+          # - vald
+          # - vearch
+          # - vespa
+        # include:
+        #   - library: pynndescent
+        #     dataset: random-xs-16-hamming
+        #   - library: datasketch
+        #     dataset: random-s-jaccard
+        #   - library: pynndescent
+        #     dataset: random-s-jaccard
 
     env:
       LIBRARY: ${{ matrix.library }}
@@ -77,7 +77,7 @@ jobs:
 
     - name: Build Library Docker Image
       run: python3 install.py
-    
+
     - name: Run the benchmark
       run: |
         python3 run.py --docker-tag ann-benchmarks-${LIBRARY} --max-n-algorithms 3 --runs 2 --dataset $DATASET --run-disabled --timeout 300
