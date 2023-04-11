@@ -65,7 +65,7 @@ jobs:
     env:
       LIBRARY: ${{ matrix.library }}
       DATASET: ${{ matrix.dataset }}
-      RUN_OPTIONS: ${{ matrix.library != 'faiss' && '--run-disabled' }}
+      RUN_OPTIONS: ${{ matrix.library == 'faiss' && '' || '--run-disabled' }}
 
     name: ${{ matrix.library }} (${{ matrix.dataset }})
 
