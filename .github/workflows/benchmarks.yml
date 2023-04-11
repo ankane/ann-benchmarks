@@ -27,6 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         dataset: [random-xs-20-angular]
+        run-options: [--run-disabled]
         library:
           # - annoy
           # - diskann
@@ -43,7 +44,7 @@ jobs:
           # - ngt
           # - nmslib
           # - opensearchknn
-          # - pgvector
+          - pgvector
           # - pynndescent
           # - qdrant
           # - qsgngt
@@ -54,17 +55,21 @@ jobs:
           # - vald
           # - vearch
           # - vespa
-        # include:
-        #   - library: pynndescent
-        #     dataset: random-xs-16-hamming
-        #   - library: datasketch
-        #     dataset: random-s-jaccard
-        #   - library: pynndescent
-        #     dataset: random-s-jaccard
+        include:
+          - library: faiss
+            dataset: random-xs-20-angular
+            run-options:
+          # - library: pynndescent
+          #   dataset: random-xs-16-hamming
+          # - library: datasketch
+          #   dataset: random-s-jaccard
+          # - library: pynndescent
+          #   dataset: random-s-jaccard
 
     env:
       LIBRARY: ${{ matrix.library }}
       DATASET: ${{ matrix.dataset }}
+      RUN_OPTIONS: ${{ matrix.run-options }}
 
     name: ${{ matrix.library }} (${{ matrix.dataset }})
 
@@ -82,8 +87,8 @@ jobs:
 
     - name: Run the benchmark
       run: |
-        python3 run.py --docker-tag ann-benchmarks-${LIBRARY} --max-n-algorithms 3 --runs 2 --dataset $DATASET --timeout 300
-        python3 run.py --docker-tag ann-benchmarks-${LIBRARY} --max-n-algorithms 3 --runs 2 --dataset $DATASET --batch --timeout 300
+        python3 run.py --docker-tag ann-benchmarks-${LIBRARY} --max-n-algorithms 3 --runs 2 $RUN_OPTIONS --dataset $DATASET --timeout 300
+        python3 run.py --docker-tag ann-benchmarks-${LIBRARY} --max-n-algorithms 3 --runs 2 $RUN_OPTIONS --dataset $DATASET --batch --timeout 300
         sudo chmod -R 777 results/
         python3 plot.py --dataset $DATASET --output plot.png
         python3 plot.py --dataset $DATASET --output plot-batch.png --batch
