@@ -3,7 +3,7 @@ name: ANN benchmarks
 on:
   push:
     branches:
-      - main
+      - faiss
   pull_request:
 
 # Cancel the workflow for the previous commit when the new commit is pushed.
@@ -12,13 +12,13 @@ concurrency:
   cancel-in-progress: True
 
 jobs:
-  unit-tests:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3 # Pull the repository
-      - run: sudo apt-get update && sudo apt-get install -y libhdf5-dev python3-numpy python3-scipy python3-matplotlib python3-sklearn
-      - run: pip3 install --quiet -r requirements.txt
-      - run: pytest
+  # unit-tests:
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - uses: actions/checkout@v3 # Pull the repository
+  #     - run: sudo apt-get update && sudo apt-get install -y libhdf5-dev python3-numpy python3-scipy python3-matplotlib python3-sklearn
+  #     - run: pip3 install --quiet -r requirements.txt
+  #     - run: pytest
 
   run-benchmarks:
     runs-on: ubuntu-22.04
@@ -28,39 +28,40 @@ jobs:
       matrix:
         dataset: [random-xs-20-angular]
         library:
-          - annoy
-          - diskann
-          - dolphinn
-          - elasticsearch
-          - elastiknn
-          - faiss
-          - flann
-          - hnswlib
-          - luceneknn
-          - milvus
-          - mrpt
-          - n2
-          - ngt
-          - nmslib
-          - opensearchknn
-          - pgvector
-          - pynndescent
-          - qdrant
-          - qsgngt
-          - scann
-          - scipy
-          - sklearn
-          - sptag
-          - vald
-          - vearch
-          - vespa
-        include:
-          - library: pynndescent 
-            dataset: random-xs-16-hamming
-          - library: datasketch
-            dataset: random-s-jaccard
-          - library: pynndescent
-            dataset: random-s-jaccard
+          # - annoy
+          # - diskann
+          # - dolphinn
+          # - elasticsearch
+          # - elastiknn
+          - faiss-ivf
+          - faiss-ivfpqfs
+          # - flann
+          # - hnswlib
+          # - luceneknn
+          # - milvus
+          # - mrpt
+          # - n2
+          # - ngt
+          # - nmslib
+          # - opensearchknn
+          # - pgvector
+          # - pynndescent
+          # - qdrant
+          # - qsgngt
+          # - scann
+          # - scipy
+          # - sklearn
+          # - sptag
+          # - vald
+          # - vearch
+          # - vespa
+        # include:
+        #   - library: pynndescent
+        #     dataset: random-xs-16-hamming
+        #   - library: datasketch
+        #     dataset: random-s-jaccard
+        #   - library: pynndescent
+        #     dataset: random-s-jaccard
 
     env:
       LIBRARY: ${{ matrix.library }}
@@ -77,7 +78,7 @@ jobs:
 
     - name: Build Library Docker Image
       run: python3 install.py
-    
+
     - name: Run the benchmark
       run: |
         python3 run.py --docker-tag ann-benchmarks-${LIBRARY} --max-n-algorithms 3 --runs 2 --dataset $DATASET --run-disabled --timeout 300
