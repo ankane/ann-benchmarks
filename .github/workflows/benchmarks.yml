@@ -27,7 +27,6 @@ jobs:
       fail-fast: false
       matrix:
         dataset: [random-xs-20-angular]
-        run-options: [--run-disabled]
         library:
           # - annoy
           # - diskann
@@ -55,21 +54,18 @@ jobs:
           # - vald
           # - vearch
           # - vespa
-        include:
-          - library: faiss
-            dataset: random-xs-20-angular
-            run-options:
-          # - library: pynndescent
-          #   dataset: random-xs-16-hamming
-          # - library: datasketch
-          #   dataset: random-s-jaccard
-          # - library: pynndescent
-          #   dataset: random-s-jaccard
+        # include:
+        #   - library: pynndescent
+        #     dataset: random-xs-16-hamming
+        #   - library: datasketch
+        #     dataset: random-s-jaccard
+        #   - library: pynndescent
+        #     dataset: random-s-jaccard
 
     env:
       LIBRARY: ${{ matrix.library }}
       DATASET: ${{ matrix.dataset }}
-      RUN_OPTIONS: ${{ matrix.run-options }}
+      RUN_OPTIONS: ${{ matrix.library != 'faiss' && '--run-disabled' }}
 
     name: ${{ matrix.library }} (${{ matrix.dataset }})
 
