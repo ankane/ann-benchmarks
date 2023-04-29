@@ -47,7 +47,7 @@ class PGVector(BaseANN):
         self._probes = probes
         self._cur.execute("SET ivfflat.probes = %d" % probes)
         # TODO set based on available memory
-        self._cur.execute("SET work_mem = '256MB'")
+        self._cur.execute("SET work_mem = '8GB'")
         # disable parallel query execution
         self._cur.execute("SET max_parallel_workers_per_gather = 0")
 

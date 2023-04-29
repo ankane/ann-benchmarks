@@ -4,9 +4,12 @@ FROM ann-benchmarks
 
 RUN git clone https://github.com/pgvector/pgvector /tmp/pgvector
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install tzdata
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential postgresql postgresql-server-dev-all
-RUN sh -c 'echo "local all all trust" > /etc/postgresql/14/main/pg_hba.conf'
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install curl ca-certificates gnupg lsb-release tzdata
+RUN curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg >/dev/null
+RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential postgresql-15 postgresql-server-dev-15
+RUN sh -c 'echo "local all all trust" > /etc/postgresql/15/main/pg_hba.conf'
 RUN cd /tmp/pgvector && \
 	make clean && \
 	make OPTFLAGS="-march=native -mprefer-vector-width=512" && \
