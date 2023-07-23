@@ -2,7 +2,7 @@ FROM ann-benchmarks
 
 # https://github.com/pgvector/pgvector/blob/master/Dockerfile
 
-RUN git clone https://github.com/pgvector/pgvector /tmp/pgvector
+RUN git clone --branch hnsw https://github.com/pgvector/pgvector /tmp/pgvector
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install tzdata
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential postgresql postgresql-server-dev-all
@@ -18,7 +18,8 @@ RUN service postgresql start && \
     psql -c "CREATE DATABASE ann" && \
     psql -c "GRANT ALL PRIVILEGES ON DATABASE ann TO ann" && \
     psql -d ann -c "CREATE EXTENSION vector" && \
-    psql -c "ALTER USER ann SET maintenance_work_mem = '16GB'"
+    psql -c "ALTER USER ann SET maintenance_work_mem = '16GB'" && \
+    psql -c "ALTER SYSTEM SET shared_buffers = '2GB'"
 USER root
 
 RUN pip install psycopg[binary] pgvector
